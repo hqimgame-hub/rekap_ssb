@@ -109,7 +109,7 @@ export default function MenuForm({ students, classId, className, homeroomTeacher
             body: tableData,
             startY: 45,
             theme: 'grid',
-            headStyles: { fillStyle: 'F', fillColor: [99, 102, 241] }, // Indigo primary
+            headStyles: { fillColor: [99, 102, 241] }, // Indigo primary
         });
 
         doc.save(`Menu_Harian_${className}_${date}.pdf`);
