@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
-import { FileBarChart, Filter, ChevronDown, Users } from "lucide-react";
+import { FileBarChart, Filter, ChevronDown, Users, Calendar } from "lucide-react";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
 
 interface NutritionLog {
     nasi: boolean;
@@ -26,10 +27,20 @@ interface AdvancedNutritionMonitorProps {
     logsToday: NutritionLog[];
     totalStudents: number;
     classes: ClassData[];
+    currentDate: string;
 }
 
-export default function AdvancedNutritionMonitor({ logsToday, totalStudents, classes }: AdvancedNutritionMonitorProps) {
+export default function AdvancedNutritionMonitor({ logsToday, totalStudents, classes, currentDate }: AdvancedNutritionMonitorProps) {
     const [selectedClassId, setSelectedClassId] = useState<string>("all");
+    const router = useRouter();
+    const pathname = usePathname();
+    const searchParams = useSearchParams();
+
+    const handleDateChange = (newDate: string) => {
+        const params = new URLSearchParams(searchParams.toString());
+        params.set('date', newDate);
+        router.push(`${pathname}?${params.toString()}`);
+    };
 
     // Logic for Global Data (Total)
     const globalStats = useMemo(() => {
@@ -86,28 +97,45 @@ export default function AdvancedNutritionMonitor({ logsToday, totalStudents, cla
                             <FileBarChart size={24} />
                         </div>
                         <div className="space-y-2">
-                            <h3 className="text-3xl sm:text-5xl font-black tracking-tighter text-slate-900">Pantauan Nutrisi Hari Ini</h3>
+                            <h3 className="text-3xl sm:text-5xl font-black tracking-tighter text-slate-900">Pantauan Nutrisi</h3>
                             <p className="text-base sm:text-lg text-slate-500 font-medium max-w-2xl leading-relaxed">
-                                Monitor kelengkapan menu secara real-time. Anda dapat membandingkan capaian total sekolah dengan performa spesifik per kelas.
+                                Monitor kelengkapan menu pada tanggal <span className="text-primary font-bold">{new Date(currentDate).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</span>.
                             </p>
                         </div>
                     </div>
 
-                    {/* Class Filter Dropdown */}
-                    <div className="relative group/select min-w-[240px]">
-                        <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 block ml-1">Filter Analisis Kelas</label>
-                        <div className="relative">
-                            <select
-                                value={selectedClassId}
-                                onChange={(e) => setSelectedClassId(e.target.value)}
-                                className="w-full appearance-none bg-slate-50 border border-slate-200 rounded-xl px-5 py-3.5 pr-12 text-sm font-bold text-slate-700 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all cursor-pointer shadow-sm"
-                            >
-                                <option value="all">Pilih Kelas untuk Detail...</option>
-                                {classes.map((c) => (
-                                    <option key={c.id} value={c.id}>{c.name}</option>
-                                ))}
-                            </select>
-                            <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none group-hover/select:text-primary transition-colors" size={18} />
+                    {/* Filters: Date & Class */}
+                    <div className="flex flex-col sm:flex-row items-center gap-4">
+                        {/* Date Picker */}
+                        <div className="relative group/select w-full sm:w-auto min-w-[200px]">
+                            <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 block ml-1">Pilih Tanggal</label>
+                            <div className="relative">
+                                <input
+                                    type="date"
+                                    value={currentDate}
+                                    onChange={(e) => handleDateChange(e.target.value)}
+                                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-5 py-3.5 pl-12 text-sm font-bold text-slate-700 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all cursor-pointer shadow-sm"
+                                />
+                                <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none group-hover/select:text-primary transition-colors" size={18} />
+                            </div>
+                        </div>
+
+                        {/* Class Filter Dropdown */}
+                        <div className="relative group/select w-full sm:w-auto min-w-[240px]">
+                            <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 block ml-1">Filter Analisis Kelas</label>
+                            <div className="relative">
+                                <select
+                                    value={selectedClassId}
+                                    onChange={(e) => setSelectedClassId(e.target.value)}
+                                    className="w-full appearance-none bg-slate-50 border border-slate-200 rounded-xl px-5 py-3.5 pr-12 text-sm font-bold text-slate-700 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all cursor-pointer shadow-sm"
+                                >
+                                    <option value="all">Pilih Kelas untuk Detail...</option>
+                                    {classes.map((c) => (
+                                        <option key={c.id} value={c.id}>{c.name}</option>
+                                    ))}
+                                </select>
+                                <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none group-hover/select:text-primary transition-colors" size={18} />
+                            </div>
                         </div>
                     </div>
                 </div>

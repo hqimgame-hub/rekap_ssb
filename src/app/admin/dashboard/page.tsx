@@ -3,20 +3,31 @@ import AdminHeader from "@/components/AdminHeader";
 import { Users, School, CheckCircle2, Activity } from "lucide-react";
 import AdvancedNutritionMonitor from "@/components/AdvancedNutritionMonitor";
 
-export default async function AdminDashboard() {
-    const today = {
-        gte: new Date(new Date().setHours(0, 0, 0, 0)),
-        lt: new Date(new Date().setHours(23, 59, 59, 999)),
+export const dynamic = 'force-dynamic';
+
+export default async function AdminDashboard({ searchParams }: { searchParams: Promise<{ date?: string }> }) {
+    const params = await searchParams;
+    const selectedDateStr = params.date || new Date().toISOString().split('T')[0];
+
+    const startOfSelectedDate = new Date(selectedDateStr);
+    startOfSelectedDate.setHours(0, 0, 0, 0);
+
+    const endOfSelectedDate = new Date(selectedDateStr);
+    endOfSelectedDate.setHours(23, 59, 59, 999);
+
+    const dateRange = {
+        gte: startOfSelectedDate,
+        lt: endOfSelectedDate,
     };
 
     const [stats, logsToday, classes] = await Promise.all([
         {
             totalStudents: await prisma.student.count(),
             totalClasses: await prisma.class.count(),
-            totalLogsToday: await prisma.dailyMenuLog.count({ where: { date: today } })
+            totalLogsToday: await prisma.dailyMenuLog.count({ where: { date: dateRange } })
         },
         prisma.dailyMenuLog.findMany({
-            where: { date: today },
+            where: { date: dateRange },
             select: {
                 nasi: true,
                 lauk: true,
@@ -85,6 +96,7 @@ export default async function AdminDashboard() {
                     logsToday={logsToday as any}
                     totalStudents={stats.totalStudents}
                     classes={classes as any}
+                    currentDate={selectedDateStr}
                 />
 
                 {/* Professional Footer */}
