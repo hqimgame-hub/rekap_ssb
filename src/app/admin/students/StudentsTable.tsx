@@ -28,6 +28,7 @@ export default function StudentsTable({ students, classes }: { students: Student
     const [page, setPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(20);
     const [selectedIds, setSelectedIds] = useState<string[]>([]);
+    const [showAll, setShowAll] = useState(false);
 
     // Edit State
     const [editingId, setEditingId] = useState<string | null>(null);
@@ -47,8 +48,8 @@ export default function StudentsTable({ students, classes }: { students: Student
     }, [students, search, filterClass]);
 
     // Pagination Logic
-    const totalPages = Math.ceil(filteredStudents.length / itemsPerPage);
-    const paginatedStudents = filteredStudents.slice((page - 1) * itemsPerPage, page * itemsPerPage);
+    const totalPages = showAll ? 1 : Math.ceil(filteredStudents.length / itemsPerPage);
+    const paginatedStudents = showAll ? filteredStudents : filteredStudents.slice((page - 1) * itemsPerPage, page * itemsPerPage);
 
     // Selection Logic
     const toggleSelectAll = () => {
@@ -349,8 +350,22 @@ export default function StudentsTable({ students, classes }: { students: Student
 
                 {/* Pagination Footer */}
                 <div className="p-5 border-t border-card-border bg-slate-50/50  flex flex-col sm:flex-row items-center justify-between gap-4">
-                    <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider text-center sm:text-left">
-                        Menampilkan <span className="text-foreground">{paginatedStudents.length}</span> dari <span className="text-foreground">{filteredStudents.length}</span> siswa
+                    <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider text-center sm:text-left flex items-center gap-4">
+                        <span>Menampilkan <span className="text-foreground">{paginatedStudents.length}</span> dari <span className="text-foreground">{filteredStudents.length}</span> siswa</span>
+                        {filteredStudents.length > 20 && (
+                            <button
+                                onClick={() => {
+                                    setShowAll(!showAll);
+                                    setPage(1);
+                                }}
+                                className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-tighter transition-all ${showAll
+                                    ? "bg-primary/10 text-primary border border-primary/20"
+                                    : "bg-slate-100 text-muted-foreground border border-slate-200 hover:bg-slate-200"
+                                    }`}
+                            >
+                                {showAll ? "Mode Halaman" : "Tampilkan Semua"}
+                            </button>
+                        )}
                     </div>
                     <div className="flex items-center gap-2">
                         <button

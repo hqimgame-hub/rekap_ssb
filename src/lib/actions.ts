@@ -211,6 +211,30 @@ export async function bulkDeleteStudents(ids: string[]) {
     }
 }
 
+export async function deleteAllStudents() {
+    try {
+        await prisma.student.deleteMany();
+        revalidatePath("/admin/students");
+        revalidatePath("/admin/dashboard");
+        revalidatePath("/");
+        return { success: true };
+    } catch (error) {
+        return { success: false, error: "Gagal menghapus semua siswa." };
+    }
+}
+
+export async function deleteAllClasses() {
+    try {
+        await prisma.class.deleteMany();
+        revalidatePath("/admin/classes");
+        revalidatePath("/admin/dashboard");
+        revalidatePath("/");
+        return { success: true };
+    } catch (error) {
+        return { success: false, error: "Gagal menghapus semua kelas." };
+    }
+}
+
 export async function importStudents(data: { name: string; className: string }[]) {
     try {
         const classes = await prisma.class.findMany();
