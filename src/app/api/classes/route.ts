@@ -9,6 +9,10 @@ export async function GET() {
         });
         return NextResponse.json(classes);
     } catch (error) {
-        return NextResponse.json({ error: "Failed to fetch classes" }, { status: 500 });
+        console.error("Database Error:", error);
+        return NextResponse.json(
+            { error: "Failed to fetch classes", details: error instanceof Error ? error.message : String(error) },
+            { status: 500 }
+        );
     }
 }
