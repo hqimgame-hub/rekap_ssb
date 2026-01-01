@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import * as XLSX from "xlsx";
 import { getMonthlyRecap } from "@/lib/actions";
-import { Download, Calendar, FileDown, Search, Info } from "lucide-react";
+import { Download, Calendar, FileDown, Search, Info, ChevronDown, ChevronUp, FileSpreadsheet, FileText, CheckCircle2 } from "lucide-react";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import AdminHeader from "@/components/AdminHeader";
@@ -13,6 +13,7 @@ export default function RecapPage() {
     const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
     const [recap, setRecap] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
+    const [showPreview, setShowPreview] = useState(false);
 
     useEffect(() => {
         fetchRecap();
@@ -39,14 +40,15 @@ export default function RecapPage() {
         });
 
         const ws = XLSX.utils.json_to_sheet(wsData);
-        XLSX.utils.book_append_sheet(XLSX.utils.book_new(), ws, "Rekap Bulanan");
-        XLSX.writeFile(XLSX.utils.book_new(), `Rekap_SSB_${selectedMonth}_${selectedYear}.xlsx`);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Rekap Bulanan");
+        XLSX.writeFile(wb, `Rekap_SSB_${selectedMonth}_${selectedYear}.xlsx`);
     };
 
     const exportToPDF = () => {
         const doc = new jsPDF("landscape");
         const monthName = new Date(0, selectedMonth - 1).toLocaleString('id-ID', { month: 'long' });
-        doc.text(`Rekap SSB - ${monthName} ${selectedYear}`, 14, 15);
+        doc.text(`Rekap SSB - ${monthName} ${selectedYear} `, 14, 15);
         autoTable(doc, {
             head: [["Nama Siswa", "Kls", ...Array.from({ length: 31 }, (_, i) => (i + 1).toString())]],
             body: recap.map(row => [row.studentName, row.className, ...Array.from({ length: 31 }, (_, i) => {
@@ -55,6 +57,7 @@ export default function RecapPage() {
             })]),
             startY: 25,
             styles: { fontSize: 7, cellPadding: 1 },
+            headStyles: { fillColor: [79, 70, 229] }
         });
         doc.save(`Rekap_SSB_${selectedMonth}_${selectedYear}.pdf`);
     };
@@ -62,123 +65,168 @@ export default function RecapPage() {
     const monthName = new Date(0, selectedMonth - 1).toLocaleString('id-ID', { month: 'long' });
 
     return (
-        <div className="min-h-screen bg-background text-foreground">
+        <div className="min-h-screen bg-slate-50">
             <AdminHeader />
-            <main className="p-4 sm:p-6 md:p-8 max-w-[1600px] mx-auto space-y-8 animate-fade-in">
-                {/* Header Section */}
-                <div className="flex flex-col xl:flex-row justify-between items-start xl:items-end gap-6 pb-2">
-                    <div className="space-y-4">
-                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-primary/5 text-primary text-[10px] font-black uppercase tracking-widest border border-primary/10">
-                            <Info size={12} /> Data Reports
-                        </div>
-                        <div className="space-y-1">
-                            <h1 className="text-3xl sm:text-4xl font-black tracking-tight leading-none italic">
-                                Rekap <span className="text-primary italic">Bulanan</span>
-                            </h1>
-                            <p className="text-xs font-bold text-muted-foreground uppercase tracking-[0.2em] pt-1">Periode Laporan {monthName} {selectedYear}</p>
-                        </div>
+            <main className="max-w-6xl mx-auto px-6 py-12 space-y-12 animate-fade-in">
+
+                {/* Hero Header Section */}
+                <div className="text-center space-y-4 max-w-2xl mx-auto">
+                    <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-indigo-50 text-indigo-600 text-[10px] font-black uppercase tracking-[0.3em] border border-indigo-100 shadow-sm">
+                        <FileText size={14} className="animate-pulse" /> Monthly Report Center
                     </div>
+                    <h1 className="text-4xl sm:text-5xl font-black tracking-tight text-slate-900 leading-tight italic">
+                        Pusat <span className="gradient-text">Laporan Bulanan</span>
+                    </h1>
+                    <p className="text-slate-500 font-medium text-lg italic">Pilih periode dan unduh laporan resmi Sekolah untuk pengarsipan bulanan.</p>
+                </div>
 
-                    <div className="flex flex-wrap items-center gap-3 w-full xl:w-auto">
-                        <div className="flex items-center gap-2 p-1.5 px-3 rounded-2xl bg-white  border border-card-border shadow-sm">
-                            <div className="flex items-center gap-3 pr-3 border-r border-card-border">
-                                <Calendar size={14} className="text-primary" />
-                                <select
-                                    value={selectedMonth}
-                                    onChange={(e) => setSelectedMonth(parseInt(e.target.value))}
-                                    className="bg-transparent border-none focus:outline-none font-black text-[11px] uppercase cursor-pointer"
-                                >
-                                    {[...Array(12)].map((_, i) => (
-                                        <option key={i + 1} value={i + 1}>{new Date(0, i).toLocaleString('id-ID', { month: 'long' })}</option>
-                                    ))}
-                                </select>
+                {/* Selection Section - Clean & Focused */}
+                <div className="bg-white rounded-[3rem] p-8 sm:p-12 shadow-2xl shadow-slate-200 border border-slate-100 relative overflow-hidden group">
+                    <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-50/50 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none group-hover:bg-indigo-100/50 transition-colors duration-700"></div>
+
+                    <div className="relative z-10 flex flex-col md:flex-row items-center gap-10">
+                        {/* Period Picker */}
+                        <div className="flex-1 space-y-6 w-full">
+                            <h3 className="text-xs font-black uppercase tracking-[0.4em] text-slate-400 text-center md:text-left">Pilih Periode Laporan</h3>
+                            <div className="flex flex-col sm:flex-row gap-4">
+                                <div className="flex-1 flex items-center gap-4 p-4 rounded-3xl bg-slate-50 border border-slate-200 hover:border-indigo-300 transition-all focus-within:ring-4 focus-within:ring-indigo-50 group/select">
+                                    <Calendar className="text-indigo-500 group-hover/select:scale-110 transition-transform" size={24} />
+                                    <select
+                                        value={selectedMonth}
+                                        onChange={(e) => setSelectedMonth(parseInt(e.target.value))}
+                                        className="bg-transparent border-none focus:outline-none font-bold text-lg cursor-pointer w-full text-slate-800"
+                                    >
+                                        {[...Array(12)].map((_, i) => (
+                                            <option key={i + 1} value={i + 1}>{new Date(0, i).toLocaleString('id-ID', { month: 'long' })}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <div className="w-full sm:w-32 flex items-center gap-4 p-4 rounded-3xl bg-slate-50 border border-slate-200 hover:border-indigo-300 transition-all">
+                                    <select
+                                        value={selectedYear}
+                                        onChange={(e) => setSelectedYear(parseInt(e.target.value))}
+                                        className="bg-transparent border-none focus:outline-none font-bold text-lg cursor-pointer w-full text-slate-800 text-center"
+                                    >
+                                        {[2024, 2025, 2026].map(y => <option key={y} value={y}>{y}</option>)}
+                                    </select>
+                                </div>
                             </div>
-                            <select
-                                value={selectedYear}
-                                onChange={(e) => setSelectedYear(parseInt(e.target.value))}
-                                className="bg-transparent border-none focus:outline-none font-black text-[11px] uppercase cursor-pointer"
-                            >
-                                {[2024, 2025, 2026].map(y => <option key={y} value={y}>{y}</option>)}
-                            </select>
                         </div>
 
-                        <div className="flex items-center gap-3">
-                            <button onClick={exportToExcel} className="h-12 px-6 rounded-[1.25rem] bg-white  border border-card-border text-[11px] font-black uppercase tracking-widest hover:bg-slate-50  transition-all flex items-center gap-2 shadow-sm active:scale-95">
-                                <Download size={14} /> EXCEL
-                            </button>
-                            <button onClick={exportToPDF} className="h-12 px-6 rounded-[1.25rem] bg-foreground text-background   text-[11px] font-black uppercase tracking-widest hover:opacity-90 transition-all flex items-center gap-2 shadow-xl shadow-slate-200  active:scale-95">
-                                <FileDown size={14} /> PDF
-                            </button>
+                        {/* Status Indicator */}
+                        <div className="flex shrink-0 items-center gap-6 p-8 rounded-[2.5rem] bg-indigo-600 text-white shadow-xl shadow-indigo-200">
+                            <div className="w-14 h-14 rounded-full bg-white/20 flex items-center justify-center">
+                                <CheckCircle2 size={32} />
+                            </div>
+                            <div>
+                                <p className="text-[10px] font-black uppercase tracking-widest text-indigo-100/80 mb-1">Status Laporan</p>
+                                <p className="text-xl font-black italic">Siap Diunduh</p>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                {/* Table Section */}
-                <div className="card-refined p-0 overflow-hidden bg-white  border-none shadow-2xl shadow-slate-100  relative">
-                    {loading && (
-                        <div className="absolute inset-0 bg-white/60  backdrop-blur-[2px] z-50 flex items-center justify-center">
-                            <div className="flex flex-col items-center gap-4">
-                                <div className="animate-spin rounded-full h-12 w-12 border-[3px] border-primary border-t-transparent"></div>
-                                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-primary">Synchronizing...</span>
+                {/* Export Cards - Two Main Actions */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    {/* Excel Card */}
+                    <button
+                        onClick={exportToExcel}
+                        className="group relative p-10 bg-white rounded-[2.5rem] border border-slate-100 shadow-xl shadow-slate-200/50 hover:shadow-2xl hover:shadow-emerald-200/40 hover:-translate-y-2 transition-all duration-500 text-left overflow-hidden"
+                    >
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-50 rounded-full translate-x-12 -translate-y-12 group-hover:scale-150 transition-transform duration-700"></div>
+                        <div className="relative z-10 space-y-6">
+                            <div className="w-16 h-16 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-100">
+                                <FileSpreadsheet size={32} />
+                            </div>
+                            <div>
+                                <h3 className="text-3xl font-black tracking-tight text-slate-900 group-hover:text-emerald-600 transition-colors">Export ke Excel</h3>
+                                <p className="text-slate-500 font-medium mt-2 italic text-sm">Download data lengkap untuk pengelolaan spreadsheet.</p>
+                            </div>
+                        </div>
+                    </button>
+
+                    {/* PDF Card */}
+                    <button
+                        onClick={exportToPDF}
+                        className="group relative p-10 bg-white rounded-[2.5rem] border border-slate-100 shadow-xl shadow-slate-200/50 hover:shadow-2xl hover:shadow-indigo-200/40 hover:-translate-y-2 transition-all duration-500 text-left overflow-hidden"
+                    >
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-50 rounded-full translate-x-12 -translate-y-12 group-hover:scale-150 transition-transform duration-700"></div>
+                        <div className="relative z-10 space-y-6">
+                            <div className="w-16 h-16 rounded-2xl bg-indigo-100 text-indigo-600 flex items-center justify-center shadow-lg shadow-indigo-100">
+                                <FileDown size={32} />
+                            </div>
+                            <div>
+                                <h3 className="text-3xl font-black tracking-tight text-slate-900 group-hover:text-indigo-600 transition-colors">Export ke PDF</h3>
+                                <p className="text-slate-500 font-medium mt-2 italic text-sm">Download laporan formal yang siap dicetak untuk arsip.</p>
+                            </div>
+                        </div>
+                    </button>
+                </div>
+
+                {/* Collapsible Preview Section */}
+                <div className="space-y-6">
+                    <button
+                        onClick={() => setShowPreview(!showPreview)}
+                        className="mx-auto flex items-center gap-3 px-8 py-4 rounded-full bg-slate-200/50 text-slate-600 hover:bg-slate-200 hover:text-slate-900 font-black text-xs uppercase tracking-[0.2em] transition-all"
+                    >
+                        {showPreview ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                        {showPreview ? "Sembunyikan Detail Data" : "Pratinjau Detail Data"}
+                    </button>
+
+                    {showPreview && (
+                        <div className="bg-white rounded-[2rem] border border-slate-200 shadow-sm overflow-hidden animate-slide-up relative">
+                            {loading && (
+                                <div className="absolute inset-0 bg-white/60 backdrop-blur-[2px] z-50 flex items-center justify-center">
+                                    <div className="animate-spin rounded-full h-10 w-10 border-[3px] border-indigo-600 border-t-transparent"></div>
+                                </div>
+                            )}
+
+                            <div className="overflow-x-auto">
+                                <table className="w-full text-left border-collapse min-w-[1000px]">
+                                    <thead>
+                                        <tr className="bg-slate-50 border-b border-slate-100">
+                                            <th className="p-5 pl-8 font-black text-[11px] text-slate-400 uppercase tracking-widest sticky left-0 bg-slate-50 z-20 w-[250px]">
+                                                Siswa
+                                            </th>
+                                            {[...Array(31)].map((_, i) => (
+                                                <th key={i} className="p-3 text-center font-black text-[10px] text-slate-300 min-w-[35px]">
+                                                    {i + 1}
+                                                </th>
+                                            ))}
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-slate-50 italic">
+                                        {recap.map((row, idx) => (
+                                            <tr key={idx} className="hover:bg-indigo-50/30 transition-colors">
+                                                <td className="p-5 pl-8 sticky left-0 bg-white z-10 border-r border-slate-50 shadow-[4px_0_10px_rgba(0,0,0,0.01)]">
+                                                    <div className="font-extrabold text-[13px] text-slate-800 uppercase tracking-tight">{row.studentName}</div>
+                                                    <div className="text-[10px] font-bold text-slate-400">Kelas {row.className}</div>
+                                                </td>
+                                                {[...Array(31)].map((_, i) => {
+                                                    const log = row.logs[i + 1];
+                                                    return (
+                                                        <td key={i} className="p-2 text-center">
+                                                            <div className={`w - 2 h - 2 rounded - full mx - auto ${!log ? "bg-slate-100" :
+                                                                    log.lengkap ? "bg-emerald-500" :
+                                                                        log.kurang ? "bg-amber-500" : "bg-rose-500"
+                                                                } `}></div>
+                                                        </td>
+                                                    );
+                                                })}
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
                     )}
-
-                    <div className="overflow-x-auto scrollbar-thin scrollbar-thumb-card-border scrollbar-track-transparent">
-                        <table className="w-full text-left border-collapse min-w-[1280px]">
-                            <thead>
-                                <tr className="bg-slate-50/80  backdrop-blur-xl border-b border-card-border">
-                                    <th className="p-4 pl-8 font-black text-[11px] text-muted-foreground uppercase tracking-[0.2em] sticky left-0 bg-slate-50  z-20 w-[280px]">
-                                        Identitas Siswa
-                                    </th>
-                                    {[...Array(31)].map((_, i) => (
-                                        <th key={i} className="p-3 text-center font-black text-[10px] text-muted-foreground/50 border-b border-card-border min-w-[40px]">
-                                            {String(i + 1).padStart(2, '0')}
-                                        </th>
-                                    ))}
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-card-border/50">
-                                {recap.length === 0 ? (
-                                    <tr><td colSpan={32} className="p-32 text-center text-muted-foreground italic font-medium">No record found for the selected period.</td></tr>
-                                ) : (
-                                    recap.map((row, idx) => (
-                                        <tr key={idx} className="group hover:bg-primary/[0.02] transition-colors">
-                                            <td className="p-4 pl-8 sticky left-0 bg-white hover:bg-slate-50   z-10 border-r border-card-border/30 shadow-[4px_0_12px_rgba(0,0,0,0.02)] transition-colors">
-                                                <div className="font-extrabold text-[13px] tracking-tight group-hover:text-primary transition-colors italic uppercase">{row.studentName}</div>
-                                                <div className="text-[10px] font-bold text-muted-foreground/60 tracking-wider">Kelas {row.className}</div>
-                                            </td>
-                                            {[...Array(31)].map((_, i) => {
-                                                const log = row.logs[i + 1];
-                                                return (
-                                                    <td key={i} className="p-2.5 text-center">
-                                                        <div
-                                                            className={`w-2.5 h-2.5 rounded-full mx-auto transition-all duration-300 group-hover:scale-150 ${!log ? "bg-slate-100 " :
-                                                                    log.lengkap ? "bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.4)]" :
-                                                                        log.kurang ? "bg-amber-500 shadow-[0_0_10px_rgba(245,158,11,0.4)]" :
-                                                                            "bg-rose-500 shadow-[0_0_10px_rgba(244,63,94,0.4)]"
-                                                                }`}
-                                                        ></div>
-                                                    </td>
-                                                );
-                                            })}
-                                        </tr>
-                                    ))
-                                )}
-                            </tbody>
-                        </table>
-                    </div>
                 </div>
 
-                {/* Legend / Info */}
-                <div className="flex flex-col md:flex-row items-center justify-between gap-6 p-8 rounded-[2.5rem] bg-slate-950 text-white selection:bg-white/10">
-                    <div className="flex flex-wrap items-center justify-center gap-8">
-                        <LegendItem color="bg-emerald-500" label="Lengkap" />
-                        <LegendItem color="bg-amber-500" label="Kurang" />
-                        <LegendItem color="bg-rose-500" label="Tidak Membawa" />
-                        <LegendItem color="bg-slate-700" label="Tanpa Data" />
-                    </div>
-                    <p className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.3em] italic">System synchronization active &bull; v1.0</p>
+                {/* Footer Disclaimer */}
+                <div className="text-center pb-20">
+                    <p className="text-[10px] font-black uppercase text-slate-300 tracking-[0.4em] flex items-center justify-center gap-2">
+                        <Info size={12} /> Data sinkron secara real-time dari database pusat
+                    </p>
                 </div>
             </main>
         </div>
