@@ -3,7 +3,10 @@
 import { useState, useEffect } from "react";
 import { saveDailyLogs } from "@/lib/actions";
 import { useRouter } from "next/navigation";
-import { Calendar, ArrowLeft, Save, User, Utensils, CheckCircle2 } from "lucide-react";
+import { Calendar, ArrowLeft, Save, User, Utensils, CheckCircle2, Download, FileDown } from "lucide-react";
+import * as XLSX from "xlsx";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 interface Student {
     id: string;
@@ -21,6 +24,14 @@ export default function MenuForm({ students, classId, className, homeroomTeacher
     const router = useRouter();
     const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
     const [loading, setLoading] = useState(false);
+    const [showNotif, setShowNotif] = useState<{ show: boolean, message: string } | null>(null);
+
+    useEffect(() => {
+        if (showNotif) {
+            const timer = setTimeout(() => setShowNotif(null), 3000);
+            return () => clearTimeout(timer);
+        }
+    }, [showNotif]);
     const [logs, setLogs] = useState<Record<string, any>>(() => {
         const initial: Record<string, any> = {};
         students.forEach(s => {
@@ -50,11 +61,62 @@ export default function MenuForm({ students, classId, className, homeroomTeacher
         const result = await saveDailyLogs(classId, dataToSave);
         setLoading(false);
 
+        const result = await saveDailyLogs(classId, dataToSave);
+        setLoading(false);
+
         if (result.success) {
-            router.push("/");
+            setShowNotif({ show: true, message: "Laporan harian berhasil disimpan!" });
         } else {
             alert(result.error);
         }
+    };
+
+    const exportToExcel = () => {
+        const wsData = students.map((student, index) => ({
+            "No": index + 1,
+            "Nama Siswa": student.name,
+            "Nasi": logs[student.id].nasi ? "V" : "-",
+            "Lauk": logs[student.id].lauk ? "V" : "-",
+            "Sayur": logs[student.id].sayur ? "V" : "-",
+            "Buah": logs[student.id].buah ? "V" : "-",
+            "Minum": logs[student.id].minum ? "V" : "-",
+        }));
+
+        const ws = XLSX.utils.json_to_sheet(wsData);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Menu Harian");
+        XLSX.writeFile(wb, `Menu_Harian_${className}_${date}.xlsx`);
+        setShowNotif({ show: true, message: "File Excel berhasil diunduh!" });
+    };
+
+    const exportToPDF = () => {
+        const doc = new jsPDF();
+        doc.setFontSize(18);
+        doc.text(`Laporan Menu Harian - Kelas ${className}`, 14, 20);
+        doc.setFontSize(11);
+        doc.text(`Tanggal: ${date}`, 14, 30);
+        doc.text(`Wali Kelas: ${homeroomTeacher || "Umum"}`, 14, 37);
+
+        const tableData = students.map((student, index) => [
+            index + 1,
+            student.name,
+            logs[student.id].nasi ? "V" : "-",
+            logs[student.id].lauk ? "V" : "-",
+            logs[student.id].sayur ? "V" : "-",
+            logs[student.id].buah ? "V" : "-",
+            logs[student.id].minum ? "V" : "-",
+        ]);
+
+        autoTable(doc, {
+            head: [["No", "Nama Siswa", "Nasi", "Lauk", "Sayur", "Buah", "Minum"]],
+            body: tableData,
+            startY: 45,
+            theme: 'grid',
+            headStyles: { fillStyle: 'F', fillColor: [99, 102, 241] }, // Indigo primary
+        });
+
+        doc.save(`Menu_Harian_${className}_${date}.pdf`);
+        setShowNotif({ show: true, message: "File PDF berhasil diunduh!" });
     };
 
     const menuItems = [
@@ -123,6 +185,28 @@ export default function MenuForm({ students, classId, className, homeroomTeacher
                     </div>
                 </div>
 
+                {/* Download Actions Bar */}
+                <div className="flex flex-wrap items-center justify-between gap-4 p-6 bg-white/40 backdrop-blur-xl border border-white/50 rounded-3xl shadow-sm">
+                    <div className="flex flex-col">
+                        <span className="text-[10px] font-black uppercase text-muted-foreground/60 tracking-widest">Ekspor Laporan</span>
+                        <span className="text-xs font-bold text-slate-800">Unduh data yang sedang tampil</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                        <button
+                            onClick={exportToExcel}
+                            className="h-12 px-6 rounded-2xl bg-emerald-50 text-emerald-600 border border-emerald-100 font-black text-[10px] uppercase tracking-widest hover:bg-emerald-100 transition-all flex items-center gap-2 shadow-sm active:scale-95"
+                        >
+                            <Download size={14} /> EXCEL
+                        </button>
+                        <button
+                            onClick={exportToPDF}
+                            className="h-12 px-6 rounded-2xl bg-slate-900 text-white font-black text-[10px] uppercase tracking-widest hover:bg-slate-800 transition-all flex items-center gap-2 shadow-xl shadow-slate-200 active:scale-95"
+                        >
+                            <FileDown size={14} /> PDF
+                        </button>
+                    </div>
+                </div>
+
                 {/* Responsive Card View - All Screen Sizes */}
                 <div className="space-y-8 sm:space-y-12">
                     {students.map((student, index) => (
@@ -188,6 +272,18 @@ export default function MenuForm({ students, classId, className, homeroomTeacher
                     </button>
                 </div>
             </div>
+
+            {/* Floating Notification */}
+            {showNotif && (
+                <div className="fixed top-28 left-1/2 -translate-x-1/2 z-[100] animate-in fade-in slide-in-from-top-4 duration-300">
+                    <div className="bg-slate-900/90 backdrop-blur-xl text-white px-8 py-4 rounded-2xl shadow-2xl border border-white/10 flex items-center gap-4">
+                        <div className="w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center shrink-0 shadow-lg shadow-emerald-500/20">
+                            <CheckCircle2 size={18} className="text-white" />
+                        </div>
+                        <span className="font-bold text-sm tracking-tight">{showNotif.message}</span>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
