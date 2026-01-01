@@ -69,7 +69,18 @@ export default function MenuForm({ students, classId, className, homeroomTeacher
     };
 
     const exportToExcel = () => {
-        const wsData = students.map((student, index) => ({
+        // Prepare Metadata Header
+        const headerData = [
+            ["LAPORAN MENU HARIAN"],
+            ["Sekolah", "SMPN 32 Surabaya"],
+            ["Kelas", className],
+            ["Wali Kelas", homeroomTeacher || "Umum"],
+            ["Tanggal", date],
+            [], // Empty row for spacing
+        ];
+
+        // Prepare Table Data
+        const tableData = students.map((student, index) => ({
             "No": index + 1,
             "Nama Siswa": student.name,
             "Nasi": logs[student.id].nasi ? "V" : "-",
@@ -79,9 +90,17 @@ export default function MenuForm({ students, classId, className, homeroomTeacher
             "Minum": logs[student.id].minum ? "V" : "-",
         }));
 
-        const ws = XLSX.utils.json_to_sheet(wsData);
+        // Create Worksheet
+        const ws = XLSX.utils.aoa_to_sheet(headerData);
+
+        // Add table data after header
+        XLSX.utils.sheet_add_json(ws, tableData, { origin: "A7" });
+
+        // Create Workbook
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, ws, "Menu Harian");
+
+        // Finalize and Download
         XLSX.writeFile(wb, `Menu_Harian_${className}_${date}.xlsx`);
         setShowNotif({ show: true, message: "File Excel berhasil diunduh!" });
     };
@@ -182,19 +201,19 @@ export default function MenuForm({ students, classId, className, homeroomTeacher
                             </div>
                         </div>
 
-                        {/* Action Bar - Integrated */}
-                        <div className="flex items-center gap-2 bg-slate-900 rounded-2xl p-2 px-3 shadow-xl">
+                        {/* Action Bar - Integrated - Enlarged */}
+                        <div className="flex items-center gap-3 bg-slate-900 rounded-[1.5rem] p-3 px-4 shadow-xl shadow-slate-200">
                             <button
                                 onClick={exportToExcel}
-                                className="h-10 px-4 rounded-xl bg-emerald-500 text-white font-black text-[9px] uppercase tracking-widest hover:bg-emerald-600 transition-all flex items-center gap-2 active:scale-95"
+                                className="h-14 px-6 rounded-2xl bg-emerald-500 text-white font-black text-[11px] uppercase tracking-widest hover:bg-emerald-600 transition-all flex items-center gap-2.5 active:scale-95 shadow-lg shadow-emerald-500/20"
                             >
-                                <Download size={14} /> EXCEL
+                                <Download size={18} /> EXCEL
                             </button>
                             <button
                                 onClick={exportToPDF}
-                                className="h-10 px-4 rounded-xl bg-white/10 text-white font-black text-[9px] uppercase tracking-widest hover:bg-white/20 transition-all flex items-center gap-2 active:scale-95"
+                                className="h-14 px-6 rounded-2xl bg-white/10 text-white font-black text-[11px] uppercase tracking-widest hover:bg-white/20 transition-all flex items-center gap-2.5 active:scale-95"
                             >
-                                <FileDown size={14} /> PDF
+                                <FileDown size={18} /> PDF
                             </button>
                         </div>
                     </div>
