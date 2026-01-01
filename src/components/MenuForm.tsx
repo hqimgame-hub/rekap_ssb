@@ -246,41 +246,37 @@ export default function MenuForm({ students, classId, className, homeroomTeacher
                         </div>
                     ))}
                 </div>
+
+                {/* Compact Action Section - Bottom of List */}
+                <div className="pt-12 pb-20 flex justify-center">
+                    <button
+                        onClick={handleSubmit}
+                        disabled={loading}
+                        className="w-full sm:max-w-md h-20 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 hover:from-indigo-700 hover:via-purple-700 hover:to-pink-700 text-white rounded-[2rem] shadow-2xl shadow-purple-500/40 font-black text-sm uppercase tracking-[0.4em] flex items-center justify-center gap-5 hover:-translate-y-1 active:scale-95 transition-all disabled:opacity-50"
+                    >
+                        {loading ? (
+                            <div className="w-6 h-6 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+                        ) : (
+                            <>
+                                <Save size={24} />
+                                <span>Simpan Laporan Harian</span>
+                            </>
+                        )}
+                    </button>
+                </div>
             </main>
 
-            {/* Compact Action Section - Bottom of List */}
-            <div className="pt-12 pb-20 flex justify-center">
-                <button
-                    onClick={handleSubmit}
-                    disabled={loading}
-                    className="w-full sm:max-w-md h-20 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 hover:from-indigo-700 hover:via-purple-700 hover:to-pink-700 text-white rounded-[2rem] shadow-2xl shadow-purple-500/40 font-black text-sm uppercase tracking-[0.4em] flex items-center justify-center gap-5 hover:-translate-y-1 active:scale-95 transition-all disabled:opacity-50"
-                >
-                    {loading ? (
-                        <div className="w-6 h-6 border-2 border-white/20 border-t-white rounded-full animate-spin" />
-                    ) : (
-                        <>
-                            <Save size={24} />
-                            <span>Simpan Laporan Harian</span>
-                        </>
-                    )}
-                </button>
-            </div>
-        </div>
-            </main >
-
-        {/* Floating Notification */ }
-    {
-        showNotif && (
-            <div className="fixed top-44 sm:top-28 left-1/2 -translate-x-1/2 z-[100] animate-in fade-in slide-in-from-top-4 duration-300">
-                <div className="bg-slate-900/90 backdrop-blur-xl text-white px-8 py-4 rounded-2xl shadow-2xl border border-white/10 flex items-center gap-4">
-                    <div className="w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center shrink-0 shadow-lg shadow-emerald-500/20">
-                        <CheckCircle2 size={18} className="text-white" />
+            {/* Floating Notification */}
+            {showNotif && (
+                <div className="fixed top-44 sm:top-28 left-1/2 -translate-x-1/2 z-[100] animate-in fade-in slide-in-from-top-4 duration-300">
+                    <div className="bg-slate-900/90 backdrop-blur-xl text-white px-8 py-4 rounded-2xl shadow-2xl border border-white/10 flex items-center gap-4">
+                        <div className="w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center shrink-0 shadow-lg shadow-emerald-500/20">
+                            <CheckCircle2 size={18} className="text-white" />
+                        </div>
+                        <span className="font-bold text-sm tracking-tight">{showNotif.message}</span>
                     </div>
-                    <span className="font-bold text-sm tracking-tight">{showNotif.message}</span>
                 </div>
-            </div>
-        )
-    }
-        </div >
+            )}
+        </div>
     );
 }
