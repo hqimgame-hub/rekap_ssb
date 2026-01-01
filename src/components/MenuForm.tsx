@@ -201,17 +201,17 @@ export default function MenuForm({ students, classId, className, homeroomTeacher
                             </div>
                         </div>
 
-                        {/* Action Bar - Integrated - Enlarged */}
-                        <div className="flex items-center gap-3 bg-slate-900 rounded-[1.5rem] p-3 px-4 shadow-xl shadow-slate-200">
+                        {/* Action Bar - Integrated - Enlarged & Balanced */}
+                        <div className="flex items-center gap-3 bg-slate-900 rounded-[1.5rem] p-3 shadow-xl shadow-slate-200">
                             <button
                                 onClick={exportToExcel}
-                                className="h-14 px-6 rounded-2xl bg-emerald-500 text-white font-black text-[11px] uppercase tracking-widest hover:bg-emerald-600 transition-all flex items-center gap-2.5 active:scale-95 shadow-lg shadow-emerald-500/20"
+                                className="flex-1 h-14 rounded-2xl bg-emerald-500 text-white font-black text-[11px] uppercase tracking-widest hover:bg-emerald-600 transition-all flex items-center justify-center gap-2.5 active:scale-95 shadow-lg shadow-emerald-500/20"
                             >
                                 <Download size={18} /> EXCEL
                             </button>
                             <button
                                 onClick={exportToPDF}
-                                className="h-14 px-6 rounded-2xl bg-white/10 text-white font-black text-[11px] uppercase tracking-widest hover:bg-white/20 transition-all flex items-center gap-2.5 active:scale-95"
+                                className="flex-1 h-14 rounded-2xl bg-white/10 text-white font-black text-[11px] uppercase tracking-widest hover:bg-white/20 transition-all flex items-center justify-center gap-2.5 active:scale-95"
                             >
                                 <FileDown size={18} /> PDF
                             </button>
