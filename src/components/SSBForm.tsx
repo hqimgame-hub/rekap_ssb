@@ -53,7 +53,7 @@ export default function SSBForm({ students, classId }: SSBFormProps) {
     };
 
     return (
-        <div className="min-h-screen bg-slate-50 dark:bg-slate-950 p-4 pb-24">
+        <div className="min-h-screen bg-slate-50 p-4 pb-24">
             <div className="max-w-4xl mx-auto py-6 animate-fade-in">
                 <div className="flex items-center justify-between mb-8">
                     <button onClick={() => router.back()} className="p-2 text-slate-400 hover:text-primary transition-colors">
@@ -66,7 +66,7 @@ export default function SSBForm({ students, classId }: SSBFormProps) {
                     <div className="w-10"></div>
                 </div>
 
-                <div className="bg-white dark:bg-slate-900 rounded-3xl p-4 shadow-sm border border-slate-200 dark:border-slate-800 mb-6 flex items-center justify-between">
+                <div className="bg-white rounded-3xl p-4 shadow-sm border border-slate-200 mb-6 flex items-center justify-between">
                     <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-500">
                             <Calendar size={20} />
@@ -89,12 +89,12 @@ export default function SSBForm({ students, classId }: SSBFormProps) {
                             key={student.id}
                             onClick={() => toggleAttendance(student.id)}
                             className={`p-5 rounded-3xl border transition-all flex items-center justify-between group ${attendance[student.id]
-                                    ? "bg-white dark:bg-slate-900 border-emerald-500/20 dark:border-emerald-500/20 shadow-sm"
-                                    : "bg-slate-50 dark:bg-slate-800/50 border-transparent opacity-60"
+                                ? "bg-white border-emerald-500/20 shadow-sm"
+                                : "bg-slate-50 border-transparent opacity-60"
                                 }`}
                         >
                             <div className="text-left">
-                                <p className={`font-black text-sm ${attendance[student.id] ? "text-slate-900 dark:text-white" : "text-slate-400"}`}>
+                                <p className={`font-black text-sm ${attendance[student.id] ? "text-slate-900" : "text-slate-400"}`}>
                                     {student.name}
                                 </p>
                                 <p className={`text-[9px] font-bold uppercase tracking-widest mt-0.5 ${attendance[student.id] ? "text-emerald-500" : "text-red-400"}`}>

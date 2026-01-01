@@ -4,14 +4,13 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { ChevronDown, UserCog, Sparkles, Sun, Moon } from "lucide-react";
+import { ChevronDown, UserCog, Sparkles } from "lucide-react";
 
 export default function HomePage() {
     const router = useRouter();
     const [classes, setClasses] = useState<any[]>([]);
     const [selectedId, setSelectedId] = useState("");
     const [loading, setLoading] = useState(true);
-    const [isDark, setIsDark] = useState(false);
 
     useEffect(() => {
         fetch("/api/classes")
@@ -20,21 +19,7 @@ export default function HomePage() {
                 setClasses(data);
                 setLoading(false);
             });
-
-        setIsDark(document.documentElement.classList.contains('dark'));
     }, []);
-
-    const toggleTheme = () => {
-        const next = !isDark;
-        setIsDark(next);
-        if (next) {
-            document.documentElement.classList.add('dark');
-            localStorage.setItem('theme', 'dark');
-        } else {
-            document.documentElement.classList.remove('dark');
-            localStorage.setItem('theme', 'light');
-        }
-    };
 
     const handleClassChange = (id: string) => {
         setSelectedId(id);
@@ -44,20 +29,10 @@ export default function HomePage() {
     };
 
     return (
-        <div className="min-h-screen bg-transparent flex flex-col justify-between relative overflow-hidden selection:bg-primary/10 transition-colors duration-300">
+        <div className="min-h-screen bg-transparent flex flex-col justify-between relative overflow-hidden selection:bg-primary/10">
             {/* Ambient Background */}
-            <div className="absolute top-[-5%] left-[-5%] w-[40%] h-[40%] bg-primary/10 blur-[120px] rounded-full opacity-40 dark:opacity-20 pointer-events-none" />
-            <div className="absolute bottom-[-5%] right-[-5%] w-[40%] h-[40%] bg-secondary/10 blur-[120px] rounded-full opacity-40 dark:opacity-20 pointer-events-none" />
-
-            {/* Header / Theme Toggle */}
-            <div className="absolute top-6 right-6 z-50">
-                <button
-                    onClick={toggleTheme}
-                    className="p-3.5 rounded-[1.25rem] bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-2 border-card-border/50 text-muted-foreground hover:text-primary transition-all shadow-lg shadow-slate-200/20 active:scale-90"
-                >
-                    {isDark ? <Sun size={24} className="text-yellow-500" /> : <Moon size={24} className="text-indigo-600" />}
-                </button>
-            </div>
+            <div className="absolute top-[-5%] left-[-5%] w-[40%] h-[40%] bg-primary/10 blur-[120px] rounded-full opacity-40 pointer-events-none" />
+            <div className="absolute bottom-[-5%] right-[-5%] w-[40%] h-[40%] bg-secondary/10 blur-[120px] rounded-full opacity-40 pointer-events-none" />
 
             <div className="flex-grow flex items-center justify-center p-6 relative z-10">
                 <div className="w-full max-w-[600px] animate-fade-in text-center space-y-20 sm:space-y-32">
@@ -111,7 +86,7 @@ export default function HomePage() {
                                     value={selectedId}
                                     onChange={(e) => handleClassChange(e.target.value)}
                                     style={{ textAlignLast: 'center' }}
-                                    className="w-full h-16 rounded-2xl bg-white dark:bg-slate-900 border-2 border-card-border appearance-none font-bold text-base sm:text-lg focus:ring-[8px] focus:ring-primary/5 focus:border-primary outline-none transition-all cursor-pointer shadow-lg shadow-slate-200/40 dark:shadow-none hover:border-primary/40 text-center pr-10 pl-10"
+                                    className="w-full h-16 rounded-2xl bg-white border-2 border-card-border appearance-none font-bold text-base sm:text-lg focus:ring-[8px] focus:ring-primary/5 focus:border-primary outline-none transition-all cursor-pointer shadow-lg shadow-slate-200/40 hover:border-primary/40 text-center pr-10 pl-10"
                                 >
                                     <option value="" disabled className="text-muted-foreground text-center">{loading ? "Memuat Data..." : "Silakan Pilih Kelas"}</option>
                                     {classes.map((c) => (
@@ -129,7 +104,7 @@ export default function HomePage() {
                     <div className="text-center pt-12 flex justify-center">
                         <Link
                             href="/admin/login"
-                            className="inline-flex items-center justify-center gap-3 py-4 px-10 rounded-2xl bg-white/50 dark:bg-slate-900/50 backdrop-blur-md border-2 border-card-border/50 text-[11px] font-black text-muted-foreground/40 hover:text-primary hover:border-primary/30 hover:bg-white dark:hover:bg-slate-900 transition-all uppercase tracking-[0.3em] shadow-lg shadow-slate-200/20 active:scale-95 group"
+                            className="inline-flex items-center justify-center gap-3 py-4 px-10 rounded-2xl bg-white/50 backdrop-blur-md border-2 border-card-border/50 text-[11px] font-black text-muted-foreground/40 hover:text-primary hover:border-primary/30 hover:bg-white transition-all uppercase tracking-[0.3em] shadow-lg shadow-slate-200/20 active:scale-95 group"
                         >
                             <UserCog size={18} className="group-hover:scale-110 transition-transform opacity-50 group-hover:opacity-100" />
                             Administrator

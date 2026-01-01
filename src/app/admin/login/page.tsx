@@ -1,34 +1,17 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { verifyAdmin } from "@/lib/actions";
-import { Lock, User, ArrowLeft, Loader2, ChevronRight, Sun, Moon, ShieldCheck, Eye, EyeOff } from "lucide-react";
+import { Lock, User, ArrowLeft, Loader2, ChevronRight, ShieldCheck, Eye, EyeOff } from "lucide-react";
 
 export default function LoginPage() {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
-    const [isDark, setIsDark] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const router = useRouter();
-
-    useEffect(() => {
-        setIsDark(document.documentElement.classList.contains('dark'));
-    }, []);
-
-    const toggleTheme = () => {
-        const next = !isDark;
-        setIsDark(next);
-        if (next) {
-            document.documentElement.classList.add('dark');
-            localStorage.setItem('theme', 'dark');
-        } else {
-            document.documentElement.classList.remove('dark');
-            localStorage.setItem('theme', 'light');
-        }
-    };
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -52,17 +35,8 @@ export default function LoginPage() {
     return (
         <div className="min-h-screen bg-transparent flex flex-col items-center justify-center p-6 relative overflow-hidden transition-colors duration-300">
             {/* Ambient Elements */}
-            <div className="absolute top-[-10%] right-[-10%] w-[50%] h-[50%] bg-primary/5 blur-[140px] rounded-full opacity-60 dark:opacity-30 pointer-events-none" />
-            <div className="absolute bottom-[-10%] left-[-10%] w-[50%] h-[50%] bg-accent/5 blur-[140px] rounded-full opacity-60 dark:opacity-30 pointer-events-none" />
-
-            <div className="absolute top-6 right-6 z-50">
-                <button
-                    onClick={toggleTheme}
-                    className="p-3.5 rounded-[1.25rem] bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-2 border-card-border/50 text-muted-foreground hover:text-primary transition-all shadow-xl shadow-slate-200/20 active:scale-90"
-                >
-                    {isDark ? <Sun size={24} className="text-yellow-500" /> : <Moon size={24} className="text-indigo-600" />}
-                </button>
-            </div>
+            <div className="absolute top-[-10%] right-[-10%] w-[50%] h-[50%] bg-primary/5 blur-[140px] rounded-full opacity-60 pointer-events-none" />
+            <div className="absolute bottom-[-10%] left-[-10%] w-[50%] h-[50%] bg-accent/5 blur-[140px] rounded-full opacity-60 pointer-events-none" />
 
             <div className="w-full max-w-[460px] space-y-10 relative z-10 animate-fade-in -mt-12 sm:-mt-20">
                 <button
@@ -73,7 +47,7 @@ export default function LoginPage() {
                     Beranda
                 </button>
 
-                <div className="card-refined p-10 sm:p-14 shadow-2xl shadow-primary/10 bg-white dark:bg-slate-900 border-2 border-card-border rounded-[2.5rem] space-y-12">
+                <div className="card-refined p-10 sm:p-14 shadow-2xl shadow-primary/10 bg-white border-2 border-card-border rounded-[2.5rem] space-y-12">
                     <div className="text-center space-y-6">
                         <div className="w-24 h-24 bg-primary/10 rounded-[2rem] flex items-center justify-center text-primary mx-auto mb-2 transition-all hover:rotate-6 duration-500 border-2 border-primary/5 shadow-inner">
                             <ShieldCheck size={48} />
@@ -90,7 +64,7 @@ export default function LoginPage() {
                         <div className="space-y-3">
                             <label className="text-[11px] font-black text-muted-foreground/60 uppercase tracking-[0.3em] ml-2">Admin Username</label>
                             <div className="relative group">
-                                <div className="absolute left-8 top-1/2 -translate-y-1/2 text-muted-foreground/50 group-focus-within:text-primary transition-all z-10 pointer-events-none p-1 bg-white/50 dark:bg-transparent rounded-lg">
+                                <div className="absolute left-8 top-1/2 -translate-y-1/2 text-muted-foreground/50 group-focus-within:text-primary transition-all z-10 pointer-events-none p-1 bg-white/50 rounded-lg">
                                     <User size={20} strokeWidth={2.5} />
                                 </div>
                                 <input
@@ -98,7 +72,7 @@ export default function LoginPage() {
                                     value={username}
                                     onChange={(e) => setUsername(e.target.value)}
                                     placeholder="ID Anda"
-                                    className="w-full h-20 pr-8 rounded-[1.75rem] bg-slate-50 dark:bg-slate-800/40 border-2 border-card-border/60 focus:ring-[12px] focus:ring-primary/5 focus:border-primary outline-none transition-all font-bold text-lg placeholder:opacity-40"
+                                    className="w-full h-20 pr-8 rounded-[1.75rem] bg-slate-50 border-2 border-card-border/60 focus:ring-[12px] focus:ring-primary/5 focus:border-primary outline-none transition-all font-bold text-lg placeholder:opacity-40"
                                     style={{ paddingLeft: '84px' }}
                                     disabled={loading}
                                     required
@@ -110,7 +84,7 @@ export default function LoginPage() {
                         <div className="space-y-3">
                             <label className="text-[11px] font-black text-muted-foreground/60 uppercase tracking-[0.3em] ml-2">Security Key</label>
                             <div className="relative group">
-                                <div className="absolute left-8 top-1/2 -translate-y-1/2 text-muted-foreground/50 group-focus-within:text-primary transition-all z-10 pointer-events-none p-1 bg-white/50 dark:bg-transparent rounded-lg">
+                                <div className="absolute left-8 top-1/2 -translate-y-1/2 text-muted-foreground/50 group-focus-within:text-primary transition-all z-10 pointer-events-none p-1 bg-white/50 rounded-lg">
                                     <Lock size={20} strokeWidth={2.5} />
                                 </div>
                                 <input
@@ -118,7 +92,7 @@ export default function LoginPage() {
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
                                     placeholder="••••••••"
-                                    className="w-full h-20 pr-16 rounded-[1.75rem] bg-slate-50 dark:bg-slate-800/40 border-2 border-card-border/60 focus:ring-[12px] focus:ring-primary/5 focus:border-primary outline-none transition-all font-bold text-lg placeholder:tracking-widest"
+                                    className="w-full h-20 pr-16 rounded-[1.75rem] bg-slate-50 border-2 border-card-border/60 focus:ring-[12px] focus:ring-primary/5 focus:border-primary outline-none transition-all font-bold text-lg placeholder:tracking-widest"
                                     style={{ paddingLeft: '84px' }}
                                     disabled={loading}
                                     required
@@ -135,7 +109,7 @@ export default function LoginPage() {
                         </div>
 
                         {error && (
-                            <div className="p-6 bg-red-50 dark:bg-red-500/10 border-2 border-red-200 dark:border-red-500/30 rounded-[1.5rem] text-red-500 text-[12px] font-black text-center animate-shake uppercase tracking-[0.2em]">
+                            <div className="p-6 bg-red-50 border-2 border-red-200 rounded-[1.5rem] text-red-500 text-[12px] font-black text-center animate-shake uppercase tracking-[0.2em]">
                                 {error}
                             </div>
                         )}
