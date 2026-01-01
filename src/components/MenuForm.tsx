@@ -61,9 +61,6 @@ export default function MenuForm({ students, classId, className, homeroomTeacher
         const result = await saveDailyLogs(classId, dataToSave);
         setLoading(false);
 
-        const result = await saveDailyLogs(classId, dataToSave);
-        setLoading(false);
-
         if (result.success) {
             setShowNotif({ show: true, message: "Laporan harian berhasil disimpan!" });
         } else {
