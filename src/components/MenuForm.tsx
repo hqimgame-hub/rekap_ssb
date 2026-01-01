@@ -130,80 +130,78 @@ export default function MenuForm({ students, classId, className, homeroomTeacher
             <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-purple-200/30 to-pink-200/30 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
             <div className="absolute bottom-0 left-0 w-96 h-96 bg-gradient-to-tr from-blue-200/30 to-indigo-200/30 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2 pointer-events-none"></div>
 
-            {/* Standardized Navigation Header - Static & Colorful */}
-            <header className="relative z-50 bg-gradient-to-r from-indigo-50/50 via-white/80 to-purple-50/50 backdrop-blur-2xl border-b border-purple-100/20 shadow-sm px-4 sm:px-6">
-                <div className="max-w-6xl mx-auto flex items-center justify-between h-20 sm:h-24">
-                    <button
-                        onClick={() => router.push("/")}
-                        className="p-3 rounded-2xl text-muted-foreground hover:text-primary hover:bg-purple-50/50 transition-all active:scale-90"
-                    >
-                        <ArrowLeft size={24} />
-                    </button>
-
-                    <div className="text-center">
-                        <h1 className="text-2xl sm:text-3xl font-black tracking-tighter uppercase">
-                            <span className="gradient-text">Menu Harian</span>
-                        </h1>
-                        <p className="text-[10px] font-black uppercase text-muted-foreground/50 tracking-[0.4em] mt-1.5">SMPN 32 Surabaya</p>
-                    </div>
-
-                    <div className="w-12"></div>
-                </div>
-            </header>
-
-            <main className="flex-grow p-4 sm:p-10 pb-40 max-w-6xl mx-auto w-full animate-fade-in space-y-8 relative z-10">
-                {/* Horizontal Info Bar */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {/* Class Info */}
-                    <div className="bg-gradient-to-br from-white to-green-50/20 backdrop-blur-sm border border-green-100/30 rounded-3xl shadow-xl shadow-green-100/30 flex items-center gap-6 p-6 sm:p-7 hover:shadow-2xl transition-all duration-500">
-                        <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br from-green-400 to-green-500 flex items-center justify-center text-white shrink-0 shadow-lg shadow-green-500/20">
-                            <Utensils size={36} />
-                        </div>
-                        <div className="min-w-0">
-                            <h2 className="text-2xl sm:text-3xl font-black tracking-tighter text-foreground uppercase truncate">Kelas {className}</h2>
-                            <p className="text-[10px] font-black uppercase text-muted-foreground/60 tracking-widest truncate">Wali: <span className="text-green-600">{homeroomTeacher || "Umum"}</span></p>
-                        </div>
-                    </div>
-
-                    {/* Date Picker */}
-                    <div className="bg-gradient-to-br from-white to-purple-50/20 backdrop-blur-sm border border-purple-100/30 rounded-3xl shadow-xl shadow-purple-100/30 flex items-center gap-6 p-6 sm:p-7 hover:shadow-2xl transition-all duration-500">
-                        <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br from-purple-400 to-purple-500 flex items-center justify-center text-white shrink-0 shadow-lg shadow-purple-500/20">
-                            <Calendar size={36} />
-                        </div>
-                        <div className="flex-1">
-                            <p className="text-[11px] font-black uppercase text-muted-foreground/40 tracking-[0.3em] mb-1">Tanggal Input</p>
-                            <input
-                                type="date"
-                                value={date}
-                                onChange={(e) => setDate(e.target.value)}
-                                className="bg-transparent border-none p-0 text-lg font-black focus:ring-0 outline-none block text-foreground uppercase cursor-pointer w-full"
-                            />
-                        </div>
-                    </div>
-                </div>
-
-                {/* Download Actions Bar */}
-                <div className="flex flex-wrap items-center justify-between gap-4 p-6 bg-white/40 backdrop-blur-xl border border-white/50 rounded-3xl shadow-sm">
-                    <div className="flex flex-col">
-                        <span className="text-[10px] font-black uppercase text-muted-foreground/60 tracking-widest">Ekspor Laporan</span>
-                        <span className="text-xs font-bold text-slate-800">Unduh data yang sedang tampil</span>
-                    </div>
-                    <div className="flex items-center gap-3">
+            {/* Sticky Header & Info Section */}
+            <div className="sticky top-0 z-50 bg-white/95 backdrop-blur-xl border-b border-indigo-100/50 shadow-lg shadow-indigo-100/20">
+                {/* Standardized Navigation Header */}
+                <header className="px-4 sm:px-6">
+                    <div className="max-w-6xl mx-auto flex items-center justify-between h-20 sm:h-24">
                         <button
-                            onClick={exportToExcel}
-                            className="h-12 px-6 rounded-2xl bg-emerald-50 text-emerald-600 border border-emerald-100 font-black text-[10px] uppercase tracking-widest hover:bg-emerald-100 transition-all flex items-center gap-2 shadow-sm active:scale-95"
+                            onClick={() => router.push("/")}
+                            className="p-3 rounded-2xl text-muted-foreground hover:text-primary hover:bg-purple-50/50 transition-all active:scale-90"
                         >
-                            <Download size={14} /> EXCEL
+                            <ArrowLeft size={24} />
                         </button>
-                        <button
-                            onClick={exportToPDF}
-                            className="h-12 px-6 rounded-2xl bg-slate-900 text-white font-black text-[10px] uppercase tracking-widest hover:bg-slate-800 transition-all flex items-center gap-2 shadow-xl shadow-slate-200 active:scale-95"
-                        >
-                            <FileDown size={14} /> PDF
-                        </button>
+
+                        <div className="text-center">
+                            <h1 className="text-2xl sm:text-3xl font-black tracking-tighter uppercase">
+                                <span className="gradient-text">Menu Harian</span>
+                            </h1>
+                            <p className="text-[10px] font-black uppercase text-muted-foreground/50 tracking-[0.4em] mt-1.5 leading-none">SMPN 32 Surabaya</p>
+                        </div>
+
+                        <div className="w-12"></div>
+                    </div>
+                </header>
+
+                {/* Compact Info & Download Bar - Sticky */}
+                <div className="max-w-6xl mx-auto px-4 sm:px-10 pb-6 space-y-4">
+                    <div className="flex flex-col md:flex-row gap-4">
+                        {/* Class Info - Compact */}
+                        <div className="flex-1 bg-green-50/50 rounded-2xl p-4 flex items-center gap-4 border border-green-100/50">
+                            <div className="w-10 h-10 rounded-xl bg-green-500 flex items-center justify-center text-white shrink-0 shadow-lg shadow-green-500/20">
+                                <Utensils size={20} />
+                            </div>
+                            <div className="min-w-0">
+                                <h2 className="text-sm font-black tracking-tight text-foreground uppercase truncate">Kelas {className}</h2>
+                                <p className="text-[8px] font-black uppercase text-green-600/70 tracking-widest truncate">{homeroomTeacher || "Umum"}</p>
+                            </div>
+                        </div>
+
+                        {/* Date Picker - Compact */}
+                        <div className="flex-1 bg-purple-50/50 rounded-2xl p-4 flex items-center gap-4 border border-purple-100/50">
+                            <div className="w-10 h-10 rounded-xl bg-purple-500 flex items-center justify-center text-white shrink-0 shadow-lg shadow-purple-500/20">
+                                <Calendar size={20} />
+                            </div>
+                            <div className="flex-1">
+                                <input
+                                    type="date"
+                                    value={date}
+                                    onChange={(e) => setDate(e.target.value)}
+                                    className="bg-transparent border-none p-0 text-sm font-black focus:ring-0 outline-none block text-foreground uppercase cursor-pointer w-full leading-none"
+                                />
+                            </div>
+                        </div>
+
+                        {/* Action Bar - Integrated */}
+                        <div className="flex items-center gap-2 bg-slate-900 rounded-2xl p-2 px-3 shadow-xl">
+                            <button
+                                onClick={exportToExcel}
+                                className="h-10 px-4 rounded-xl bg-emerald-500 text-white font-black text-[9px] uppercase tracking-widest hover:bg-emerald-600 transition-all flex items-center gap-2 active:scale-95"
+                            >
+                                <Download size={14} /> EXCEL
+                            </button>
+                            <button
+                                onClick={exportToPDF}
+                                className="h-10 px-4 rounded-xl bg-white/10 text-white font-black text-[9px] uppercase tracking-widest hover:bg-white/20 transition-all flex items-center gap-2 active:scale-95"
+                            >
+                                <FileDown size={14} /> PDF
+                            </button>
+                        </div>
                     </div>
                 </div>
+            </div>
 
+            <main className="flex-grow p-4 sm:p-10 max-w-6xl mx-auto w-full animate-fade-in space-y-8 relative z-10">
                 {/* Responsive Card View - All Screen Sizes */}
                 <div className="space-y-8 sm:space-y-12">
                     {students.map((student, index) => (
@@ -250,37 +248,39 @@ export default function MenuForm({ students, classId, className, homeroomTeacher
                 </div>
             </main>
 
-            {/* Compact Action Footer */}
-            <div className="fixed bottom-0 left-0 right-0 p-8 bg-gradient-to-t from-white via-white/90 to-transparent z-50">
-                <div className="max-w-6xl mx-auto flex justify-center">
-                    <button
-                        onClick={handleSubmit}
-                        disabled={loading}
-                        className="w-full sm:max-w-xs h-16 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white rounded-[1.5rem] shadow-2xl shadow-purple-500/30 font-black text-sm uppercase tracking-[0.4em] flex items-center justify-center gap-4 hover:-translate-y-1 active:scale-95 transition-all disabled:opacity-50"
-                    >
-                        {loading ? (
-                            <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin" />
-                        ) : (
-                            <>
-                                <Save size={20} />
-                                <span>Simpan Laporan</span>
-                            </>
-                        )}
-                    </button>
+            {/* Compact Action Section - Bottom of List */}
+            <div className="pt-12 pb-20 flex justify-center">
+                <button
+                    onClick={handleSubmit}
+                    disabled={loading}
+                    className="w-full sm:max-w-md h-20 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 hover:from-indigo-700 hover:via-purple-700 hover:to-pink-700 text-white rounded-[2rem] shadow-2xl shadow-purple-500/40 font-black text-sm uppercase tracking-[0.4em] flex items-center justify-center gap-5 hover:-translate-y-1 active:scale-95 transition-all disabled:opacity-50"
+                >
+                    {loading ? (
+                        <div className="w-6 h-6 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+                    ) : (
+                        <>
+                            <Save size={24} />
+                            <span>Simpan Laporan Harian</span>
+                        </>
+                    )}
+                </button>
+            </div>
+        </div>
+            </main >
+
+        {/* Floating Notification */ }
+    {
+        showNotif && (
+            <div className="fixed top-44 sm:top-28 left-1/2 -translate-x-1/2 z-[100] animate-in fade-in slide-in-from-top-4 duration-300">
+                <div className="bg-slate-900/90 backdrop-blur-xl text-white px-8 py-4 rounded-2xl shadow-2xl border border-white/10 flex items-center gap-4">
+                    <div className="w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center shrink-0 shadow-lg shadow-emerald-500/20">
+                        <CheckCircle2 size={18} className="text-white" />
+                    </div>
+                    <span className="font-bold text-sm tracking-tight">{showNotif.message}</span>
                 </div>
             </div>
-
-            {/* Floating Notification */}
-            {showNotif && (
-                <div className="fixed top-28 left-1/2 -translate-x-1/2 z-[100] animate-in fade-in slide-in-from-top-4 duration-300">
-                    <div className="bg-slate-900/90 backdrop-blur-xl text-white px-8 py-4 rounded-2xl shadow-2xl border border-white/10 flex items-center gap-4">
-                        <div className="w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center shrink-0 shadow-lg shadow-emerald-500/20">
-                            <CheckCircle2 size={18} className="text-white" />
-                        </div>
-                        <span className="font-bold text-sm tracking-tight">{showNotif.message}</span>
-                    </div>
-                </div>
-            )}
-        </div>
+        )
+    }
+        </div >
     );
 }
