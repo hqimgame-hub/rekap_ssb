@@ -241,7 +241,7 @@ export default function MenuForm({ students, classId, className, homeroomTeacher
                                     <select
                                         value={logs[student.id].keterangan || ""}
                                         onChange={(e) => handleKeteranganChange(student.id, e.target.value)}
-                                        className={`h-11 px-4 rounded-xl border-2 text-[10px] font-black uppercase tracking-wider outline-none transition-all cursor-pointer appearance-none pr-10
+                                        className={`h-12 px-5 rounded-xl border-2 text-xs font-black uppercase tracking-wider outline-none transition-all cursor-pointer appearance-none pr-11
                                             ${logs[student.id].keterangan === "Tidak Masuk"
                                                 ? "bg-rose-50 border-rose-200 text-rose-600"
                                                 : logs[student.id].keterangan === "Tidak Membawa"
@@ -249,13 +249,13 @@ export default function MenuForm({ students, classId, className, homeroomTeacher
                                                     : "bg-slate-50 border-slate-200 text-slate-600 focus:border-indigo-300"
                                             }`}
                                     >
-                                        <option value="">Hadir (Normal)</option>
+                                        <option value="">Hadir</option>
                                         <option value="Tidak Masuk">Tidak Masuk</option>
                                         <option value="Tidak Membawa">Tidak Membawa</option>
                                     </select>
-                                    <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none opacity-50">
-                                        <svg width="10" height="6" viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                            <path d="M1 1L5 5L9 1" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                    <div className="absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none opacity-40">
+                                        <svg width="8" height="6" viewBox="0 0 8 6" fill="currentColor">
+                                            <path d="M0 0L4 6L8 0H0Z" />
                                         </svg>
                                     </div>
                                 </div>
