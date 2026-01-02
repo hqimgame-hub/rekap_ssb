@@ -23,9 +23,17 @@ interface MenuFormProps {
 
 export default function MenuForm({ students, classId, className, homeroomTeacher, uploadUrl }: MenuFormProps) {
     const router = useRouter();
-    const [date, setDate] = useState(new Date().toLocaleDateString('en-CA'));
+    const [date, setDate] = useState("");
     const [loading, setLoading] = useState(false);
     const [showNotif, setShowNotif] = useState<{ show: boolean, message: string } | null>(null);
+
+    useEffect(() => {
+        const today = new Date();
+        const yyyy = today.getFullYear();
+        const mm = String(today.getMonth() + 1).padStart(2, '0');
+        const dd = String(today.getDate()).padStart(2, '0');
+        setDate(`${yyyy}-${mm}-${dd}`);
+    }, []);
 
     useEffect(() => {
         if (showNotif) {
@@ -171,10 +179,12 @@ export default function MenuForm({ students, classId, className, homeroomTeacher
     ];
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 flex flex-col relative overflow-x-hidden">
-            {/* Decorative Background Elements */}
-            <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-purple-200/30 to-pink-200/30 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
-            <div className="absolute bottom-0 left-0 w-96 h-96 bg-gradient-to-tr from-blue-200/30 to-indigo-200/30 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2 pointer-events-none"></div>
+        <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 flex flex-col relative">
+            {/* Decorative Background Elements - Wrapped to prevent overflow breaking sticky */}
+            <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
+                <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-purple-200/30 to-pink-200/30 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
+                <div className="absolute bottom-0 left-0 w-96 h-96 bg-gradient-to-tr from-blue-200/30 to-indigo-200/30 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2"></div>
+            </div>
 
             {/* Sticky Header & Info Section */}
             <div className="sticky top-0 z-50 bg-white/95 backdrop-blur-xl border-b border-indigo-100/50 shadow-lg shadow-indigo-100/20">
