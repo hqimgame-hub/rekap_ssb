@@ -82,12 +82,17 @@ export default function MenuForm({ students, classId, className, homeroomTeacher
     };
 
     const exportToExcel = () => {
+        const dayNames = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
+        const dayName = dayNames[new Date(date).getDay()];
+
         // Prepare Metadata Header
         const headerData = [
-            ["LAPORAN MENU HARIAN"],
-            ["Sekolah", "SMPN 32 Surabaya"],
+            [`LAPORAN SARAPAN SEHAT BERSAMA - ${className}`],
+            ["SMP Negeri 32 Surabaya"],
+            [],
             ["Kelas", className],
             ["Wali Kelas", homeroomTeacher || "Umum"],
+            ["Hari", dayName],
             ["Tanggal", date],
             [], // Empty row for spacing
         ];
@@ -108,24 +113,31 @@ export default function MenuForm({ students, classId, className, homeroomTeacher
         const ws = XLSX.utils.aoa_to_sheet(headerData);
 
         // Add table data after header
-        XLSX.utils.sheet_add_json(ws, tableData, { origin: "A7" });
+        XLSX.utils.sheet_add_json(ws, tableData, { origin: "A9" });
 
         // Create Workbook
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, ws, "Menu Harian");
 
         // Finalize and Download
-        XLSX.writeFile(wb, `Menu_Harian_${className}_${date}.xlsx`);
+        XLSX.writeFile(wb, `Laporan_SSB_${className}_${date}.xlsx`);
         setShowNotif({ show: true, message: "File Excel berhasil diunduh!" });
     };
 
     const exportToPDF = () => {
+        const dayNames = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
+        const dayName = dayNames[new Date(date).getDay()];
+
         const doc = new jsPDF();
-        doc.setFontSize(18);
-        doc.text(`Laporan Menu Harian - Kelas ${className}`, 14, 20);
-        doc.setFontSize(11);
-        doc.text(`Tanggal: ${date}`, 14, 30);
-        doc.text(`Wali Kelas: ${homeroomTeacher || "Umum"}`, 14, 37);
+        doc.setFontSize(16);
+        doc.text(`Laporan Sarapan Sehat Bersama - ${className}`, 14, 20);
+        doc.setFontSize(12);
+        doc.text(`SMP Negeri 32 Surabaya`, 14, 28);
+
+        doc.setFontSize(10);
+        doc.text(`Hari: ${dayName}`, 14, 38);
+        doc.text(`Tanggal: ${date}`, 14, 43);
+        doc.text(`Wali Kelas: ${homeroomTeacher || "Umum"}`, 14, 48);
 
         const tableData = students.map((student, index) => [
             index + 1,
@@ -141,12 +153,12 @@ export default function MenuForm({ students, classId, className, homeroomTeacher
         autoTable(doc, {
             head: [["No", "Nama Siswa", "Nasi", "Lauk", "Sayur", "Buah", "Minum", "Keterangan"]],
             body: tableData,
-            startY: 45,
+            startY: 55,
             theme: 'grid',
             headStyles: { fillColor: [99, 102, 241] }, // Indigo primary
         });
 
-        doc.save(`Menu_Harian_${className}_${date}.pdf`);
+        doc.save(`Laporan_SSB_${className}_${date}.pdf`);
         setShowNotif({ show: true, message: "File PDF berhasil diunduh!" });
     };
 
