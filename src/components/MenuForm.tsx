@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { saveDailyLogs } from "@/lib/actions";
 import { useRouter } from "next/navigation";
-import { Calendar, ArrowLeft, Save, User, Utensils, CheckCircle2, Download, FileDown } from "lucide-react";
+import { Calendar, ArrowLeft, Save, User, Utensils, CheckCircle2, Download, FileDown, Upload } from "lucide-react";
 import * as XLSX from "xlsx";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
@@ -18,9 +18,10 @@ interface MenuFormProps {
     classId: string;
     className: string;
     homeroomTeacher?: string | null;
+    uploadUrl?: string;
 }
 
-export default function MenuForm({ students, classId, className, homeroomTeacher }: MenuFormProps) {
+export default function MenuForm({ students, classId, className, homeroomTeacher, uploadUrl }: MenuFormProps) {
     const router = useRouter();
     const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
     const [loading, setLoading] = useState(false);
@@ -35,10 +36,22 @@ export default function MenuForm({ students, classId, className, homeroomTeacher
     const [logs, setLogs] = useState<Record<string, any>>(() => {
         const initial: Record<string, any> = {};
         students.forEach(s => {
-            initial[s.id] = { nasi: false, lauk: false, sayur: false, buah: false, minum: false };
+            initial[s.id] = { nasi: false, lauk: false, sayur: false, buah: false, minum: false, keterangan: "" };
         });
         return initial;
     });
+
+    const handleKeteranganChange = (studentId: string, value: string) => {
+        setLogs(prev => ({
+            ...prev,
+            [studentId]: {
+                ...prev[studentId],
+                keterangan: value,
+                // If "Tidak Masuk", reset all checkboxes
+                ...(value === "Tidak Masuk" ? { nasi: false, lauk: false, sayur: false, buah: false, minum: false } : {})
+            }
+        }));
+    };
 
     const handleToggle = (studentId: string, field: string) => {
         setLogs(prev => ({
@@ -88,6 +101,7 @@ export default function MenuForm({ students, classId, className, homeroomTeacher
             "Sayur": logs[student.id].sayur ? "V" : "-",
             "Buah": logs[student.id].buah ? "V" : "-",
             "Minum": logs[student.id].minum ? "V" : "-",
+            "Keterangan": logs[student.id].keterangan || "Hadir",
         }));
 
         // Create Worksheet
@@ -121,10 +135,11 @@ export default function MenuForm({ students, classId, className, homeroomTeacher
             logs[student.id].sayur ? "V" : "-",
             logs[student.id].buah ? "V" : "-",
             logs[student.id].minum ? "V" : "-",
+            logs[student.id].keterangan || "Hadir",
         ]);
 
         autoTable(doc, {
-            head: [["No", "Nama Siswa", "Nasi", "Lauk", "Sayur", "Buah", "Minum"]],
+            head: [["No", "Nama Siswa", "Nasi", "Lauk", "Sayur", "Buah", "Minum", "Keterangan"]],
             body: tableData,
             startY: 45,
             theme: 'grid',
@@ -201,21 +216,7 @@ export default function MenuForm({ students, classId, className, homeroomTeacher
                             </div>
                         </div>
 
-                        {/* Action Bar - Integrated - Enlarged & Balanced */}
-                        <div className="flex items-center gap-3 bg-slate-900 rounded-[1.5rem] p-3 shadow-xl shadow-slate-200">
-                            <button
-                                onClick={exportToExcel}
-                                className="flex-1 h-14 rounded-2xl bg-emerald-500 text-white font-black text-[11px] uppercase tracking-widest hover:bg-emerald-600 transition-all flex items-center justify-center gap-2.5 active:scale-95 shadow-lg shadow-emerald-500/20"
-                            >
-                                <Download size={18} /> EXCEL
-                            </button>
-                            <button
-                                onClick={exportToPDF}
-                                className="flex-1 h-14 rounded-2xl bg-white/10 text-white font-black text-[11px] uppercase tracking-widest hover:bg-white/20 transition-all flex items-center justify-center gap-2.5 active:scale-95"
-                            >
-                                <FileDown size={18} /> PDF
-                            </button>
-                        </div>
+                        {/* Action Bar - Hidden from Header as requested */}
                     </div>
                 </div>
             </div>
@@ -235,6 +236,29 @@ export default function MenuForm({ students, classId, className, homeroomTeacher
                                 <h3 className="font-extrabold text-xl sm:text-2xl tracking-tighter uppercase text-slate-800 flex-1">
                                     {student.name}
                                 </h3>
+
+                                <div className="relative group/select">
+                                    <select
+                                        value={logs[student.id].keterangan || ""}
+                                        onChange={(e) => handleKeteranganChange(student.id, e.target.value)}
+                                        className={`h-11 px-4 rounded-xl border-2 text-[10px] font-black uppercase tracking-wider outline-none transition-all cursor-pointer appearance-none pr-10
+                                            ${logs[student.id].keterangan === "Tidak Masuk"
+                                                ? "bg-rose-50 border-rose-200 text-rose-600"
+                                                : logs[student.id].keterangan === "Tidak Membawa"
+                                                    ? "bg-amber-50 border-amber-200 text-amber-600"
+                                                    : "bg-slate-50 border-slate-200 text-slate-600 focus:border-indigo-300"
+                                            }`}
+                                    >
+                                        <option value="">Hadir (Normal)</option>
+                                        <option value="Tidak Masuk">Tidak Masuk</option>
+                                        <option value="Tidak Membawa">Tidak Membawa</option>
+                                    </select>
+                                    <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none opacity-50">
+                                        <svg width="10" height="6" viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M1 1L5 5L9 1" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                        </svg>
+                                    </div>
+                                </div>
                             </div>
 
                             {/* Menu Checkboxes Grid - Improved Spacing */}
@@ -242,8 +266,9 @@ export default function MenuForm({ students, classId, className, homeroomTeacher
                                 {menuItems.map((item) => (
                                     <button
                                         key={item.key}
+                                        disabled={logs[student.id].keterangan === "Tidak Masuk"}
                                         onClick={() => handleToggle(student.id, item.key)}
-                                        className={`flex flex-col items-center justify-center gap-2 p-4 sm:p-5 rounded-xl border-2 transition-all active:scale-95 ${logs[student.id][item.key]
+                                        className={`flex flex-col items-center justify-center gap-2 p-4 sm:p-5 rounded-xl border-2 transition-all active:scale-95 disabled:opacity-30 disabled:grayscale disabled:cursor-not-allowed ${logs[student.id][item.key]
                                             ? `${item.color} ${item.hoverColor} border-transparent text-white shadow-lg shadow-${item.key}-500/30`
                                             : `${item.bgLight} border-${item.key}-200/50 ${item.textColor} hover:border-${item.key}-300 hover:shadow-md`
                                             }`}
@@ -267,21 +292,46 @@ export default function MenuForm({ students, classId, className, homeroomTeacher
                 </div>
 
                 {/* Compact Action Section - Bottom of List */}
-                <div className="pt-12 pb-20 flex justify-center">
+                <div className="pt-6 pb-24 flex flex-col items-center gap-6">
                     <button
                         onClick={handleSubmit}
                         disabled={loading}
-                        className="w-full sm:max-w-md h-20 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 hover:from-indigo-700 hover:via-purple-700 hover:to-pink-700 text-white rounded-[2rem] shadow-2xl shadow-purple-500/40 font-black text-sm uppercase tracking-[0.4em] flex items-center justify-center gap-5 hover:-translate-y-1 active:scale-95 transition-all disabled:opacity-50"
+                        className="w-full sm:max-w-md h-16 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 hover:from-indigo-700 hover:via-purple-700 hover:to-pink-700 text-white rounded-2xl shadow-2xl shadow-purple-500/20 font-black text-xs sm:text-sm uppercase tracking-widest flex items-center justify-center gap-4 hover:-translate-y-1 active:scale-95 transition-all disabled:opacity-50"
                     >
                         {loading ? (
                             <div className="w-6 h-6 border-2 border-white/20 border-t-white rounded-full animate-spin" />
                         ) : (
                             <>
-                                <Save size={24} />
+                                <Save size={20} />
                                 <span>Simpan Laporan Harian</span>
                             </>
                         )}
                     </button>
+
+                    {/* Secondary Action Buttons - Restructured Below Submit */}
+                    <div className="flex items-center gap-4 w-full sm:max-w-md">
+                        <button
+                            onClick={exportToExcel}
+                            className="flex-1 h-14 rounded-2xl bg-emerald-500 text-white font-black text-[11px] sm:text-xs uppercase tracking-widest hover:bg-emerald-600 transition-all flex items-center justify-center gap-2.5 active:scale-95 shadow-lg shadow-emerald-500/20"
+                        >
+                            <Download size={18} /> EXCEL
+                        </button>
+                        <button
+                            onClick={exportToPDF}
+                            className="flex-1 h-14 rounded-2xl bg-slate-800 text-white font-black text-[11px] sm:text-xs uppercase tracking-widest hover:bg-slate-900 transition-all flex items-center justify-center gap-2.5 active:scale-95 shadow-lg shadow-slate-900/20"
+                        >
+                            <FileDown size={18} /> PDF
+                        </button>
+                    </div>
+
+                    {uploadUrl && (
+                        <button
+                            onClick={() => window.open(uploadUrl, '_blank')}
+                            className="w-full sm:max-w-md h-14 rounded-2xl bg-indigo-50 text-indigo-600 border-2 border-indigo-100 font-black text-[11px] sm:text-xs uppercase tracking-widest hover:bg-indigo-100 transition-all flex items-center justify-center gap-3 active:scale-95 shadow-lg shadow-indigo-100/10"
+                        >
+                            <Upload size={18} /> Kirim Laporan
+                        </button>
+                    )}
                 </div>
             </main>
 

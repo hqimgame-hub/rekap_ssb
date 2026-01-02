@@ -21,7 +21,7 @@ export default async function AdminDashboard({ searchParams }: { searchParams: P
         lt: endOfSelectedDate,
     };
 
-    const [stats, logsToday, classes, allStudents] = await Promise.all([
+    const [stats, logsToday, classes, allStudents, uploadUrl] = await Promise.all([
         {
             totalStudents: await prisma.student.count(),
             totalClasses: await prisma.class.count(),
@@ -59,7 +59,10 @@ export default async function AdminDashboard({ searchParams }: { searchParams: P
                 }
             },
             orderBy: { name: 'asc' }
-        })
+        }),
+        prisma.systemSetting?.findUnique({
+            where: { key: "upload_url" }
+        }).then(s => s?.value || "")
     ]);
 
     return (
@@ -109,6 +112,49 @@ export default async function AdminDashboard({ searchParams }: { searchParams: P
                     classes={classes as any}
                     currentDate={selectedDateStr}
                 />
+
+                {/* External Link Configuration */}
+                <div className="space-y-8 animate-fade-in">
+                    <div className="flex flex-col gap-2">
+                        <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 rounded-lg bg-indigo-600 text-white flex items-center justify-center">
+                                <Activity size={16} />
+                            </div>
+                            <h2 className="text-xl font-black tracking-tight text-foreground uppercase">Link Eksternal Guru</h2>
+                        </div>
+                        <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest ml-11 opacity-60">
+                            Konfigurasi tautan untuk guru mengunggah bukti foto/laporan
+                        </p>
+                    </div>
+
+                    <div className="card-refined p-8 bg-white border-indigo-50 flex flex-col md:flex-row items-center justify-between gap-8 group relative overflow-hidden">
+                        <div className="space-y-4 relative z-10 flex-grow w-full">
+                            <h3 className="text-lg font-black text-slate-900 uppercase">Tautan Upload Bukti</h3>
+                            <form action={async (formData: FormData) => {
+                                'use server';
+                                const { updateSystemSetting } = await import('@/lib/actions');
+                                const url = formData.get('upload_url') as string;
+                                await updateSystemSetting('upload_url', url);
+                            }} className="flex flex-col sm:flex-row gap-4">
+                                <input
+                                    type="url"
+                                    name="upload_url"
+                                    defaultValue={uploadUrl}
+                                    placeholder="https://drive.google.com/..."
+                                    className="flex-grow h-12 px-5 rounded-xl bg-slate-50 border border-slate-200 outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all font-bold text-sm"
+                                />
+                                <button type="submit" className="h-12 px-8 rounded-xl bg-indigo-600 text-white font-black text-[11px] uppercase tracking-widest hover:bg-indigo-700 active:scale-95 transition-all shadow-lg shadow-indigo-600/20">
+                                    Simpan Link
+                                </button>
+                            </form>
+                            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest leading-relaxed">
+                                Link ini akan muncul sebagai tombol "KIRIM LAPORAN" di halaman input menu wali kelas.
+                            </p>
+                        </div>
+                        <div className="absolute top-0 right-0 w-64 h-full bg-gradient-to-l from-indigo-50/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+                    </div>
+                </div>
+
 
                 {/* Data Management Section - Danger Zone */}
                 <div className="space-y-8 animate-fade-in">

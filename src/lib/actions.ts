@@ -370,3 +370,32 @@ export async function verifyAdmin(username: string, password: string) {
     }
     return { success: false, error: "Username atau password salah." };
 }
+
+// System Settings Actions
+export async function getSystemSetting(key: string) {
+    try {
+        const setting = await prisma.systemSetting.findUnique({
+            where: { key }
+        });
+        return setting?.value || "";
+    } catch (error) {
+        console.error(`Failed to get setting ${key}:`, error);
+        return "";
+    }
+}
+
+export async function updateSystemSetting(key: string, value: string) {
+    try {
+        await prisma.systemSetting.upsert({
+            where: { key },
+            update: { value },
+            create: { key, value }
+        });
+        revalidatePath("/admin/dashboard");
+        revalidatePath("/input-menu/[classId]", "page");
+        return { success: true };
+    } catch (error) {
+        console.error(`Failed to update setting ${key}:`, error);
+        return { success: false, error: "Gagal memperbarui pengaturan." };
+    }
+}
