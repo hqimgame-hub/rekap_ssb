@@ -23,7 +23,7 @@ interface MenuFormProps {
 
 export default function MenuForm({ students, classId, className, homeroomTeacher, uploadUrl }: MenuFormProps) {
     const router = useRouter();
-    const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
+    const [date, setDate] = useState(new Date().toLocaleDateString('en-CA'));
     const [loading, setLoading] = useState(false);
     const [showNotif, setShowNotif] = useState<{ show: boolean, message: string } | null>(null);
 
@@ -171,7 +171,7 @@ export default function MenuForm({ students, classId, className, homeroomTeacher
     ];
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 flex flex-col relative overflow-hidden">
+        <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 flex flex-col relative overflow-x-hidden">
             {/* Decorative Background Elements */}
             <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-purple-200/30 to-pink-200/30 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
             <div className="absolute bottom-0 left-0 w-96 h-96 bg-gradient-to-tr from-blue-200/30 to-indigo-200/30 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2 pointer-events-none"></div>
